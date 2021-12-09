@@ -1,0 +1,5 @@
+## fundamentals:
+    [ ] research geohash in postgis
+    [ ] find way to create a (big)int geohash or hilbert hash in postgres
+
+## operations:
