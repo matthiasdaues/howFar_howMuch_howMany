@@ -14,8 +14,8 @@ rough_selection as (
     ,   area a
     where
         a.geom && r.geom
-    )-- create table base.road_network_subset as
-
+    )
+-- create table base.road_network_subset as
 SELECT
     r.*
 FROM
