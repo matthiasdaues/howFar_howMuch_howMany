@@ -1,0 +1,21 @@
+select 
+    st_makeline(addr.geom, st_closestpoint(res.geom, addr.geom))::geometry as geom
+,   st_astext(st_makeline(addr.geom, st_closestpoint(addr.geom, res.geom ))::geometry) as geom_text
+,   addr.addr_id
+,   res.way_id
+from
+--   (select node_id, geom from osm.addr_points where node_id = 2435899881) addr
+    osm.addr_combined addr
+join lateral (
+select
+    way_id
+,   geom
+from
+    osm.highways way
+order by
+    addr.geom <-> way.geom 
+limit
+    1
+) as res on true;
+
+

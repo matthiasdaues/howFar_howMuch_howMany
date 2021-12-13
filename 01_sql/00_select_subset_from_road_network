@@ -1,6 +1,6 @@
 with area as (
     select 
-        b.geom
+        st_transform(b.geom,4326)
     FROM
         base.l_06_mu_de_25832_po_250 b
     where 
