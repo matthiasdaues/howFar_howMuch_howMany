@@ -3,3 +3,7 @@
     [ ] find way to create a (big)int geohash or hilbert hash in postgres
 
 ## operations:
+
+## osm-import: 
+    [ ] create address coordinates from nodes, ways and relations
+    [ ] filter polygons that have an address but are not buildings (cemetaries, e.g.)

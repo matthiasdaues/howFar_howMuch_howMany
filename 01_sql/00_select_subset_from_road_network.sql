@@ -1,6 +1,6 @@
 with area as (
     select 
-        st_transform(b.geom,4326)
+        st_transform(b.geom,4326) as geom
     FROM
         base.l_06_mu_de_25832_po_250 b
     where 
@@ -10,7 +10,7 @@ rough_selection as (
     SELECT
         r.*
     FROM
-        osm.road_network r
+        osm.highways r
     ,   area a
     where
         a.geom && r.geom
