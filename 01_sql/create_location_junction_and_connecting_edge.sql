@@ -13,21 +13,14 @@ DROP FUNCTION osm.create_location_junction(bigint, geometry);
 CREATE OR REPLACE FUNCTION osm.create_location_junction(
     this_addr_id bigint	
 ,   this_addr_geom geometry
--- ,   OUT addr_id bigint
--- ,   OUT addr_location_id bigint
--- ,   OUT way_id bigint
--- ,   OUT junction_location_id bigint
--- ,   OUT junction_edge geometry
--- ,   OUT junction_node geometry
 )
 
 RETURNS TABLE (
 	addr_id bigint
 ,   addr_location_id bigint
-,   way_id bigint
 ,   junction_location_id bigint
-,   junction_edge geometry
-,   junction_node geometry
+--,   junction_edge geometry
+--,   junction_node geometry
 )
 
 LANGUAGE plpgsql as $$
@@ -50,25 +43,27 @@ BEGIN
         from osm.highways way
         order by this_addr_geom <-> way.geom 
         limit 1; 
-    junction_location      := st_closestpoint(way_geom, t_addr_geom);
+    junction_location      := st_closestpoint(way_geom, this_addr_geom);
     junction_location_hash := st_geohash(junction_location::geometry,10);
-    junction_location_id   := geohash_decode(junction_location_hash)
+    junction_location_id   := geohash_decode(junction_location_hash);
 
+-- test block for plausibility of hashing operation
+
+    addr_geohash_reverse           := geohash_encode(addr_location_id)
+	addr_location_reverse          := 
+	junction_location_hash_reverse :=
+	junction_location_reverse      :=
+	
+----------------------------------------------------
 
     return query
     
-	with address as (
-        select 
-		    this_addr_id as t_addr_id
-		,   this_addr_geom as t_addr_geom
-	)
     select
-        addr_id 
-    ,   addr_location_id 
-    ,   way_id 
+        this_addr_id as addr_id 
+    ,   addr_location_id
     ,   junction_location_id 
-    ,   junction_edge 
-    ,   junction_node 
+--    ,   junction_edge 
+--    ,   junction_node 
     ;
 	
 END;
