@@ -72,9 +72,9 @@ BEGIN
 -- test block for plausibility of hashing operation
 
     addr_geohash_reverse           := geohash_encode(addr_location_id);
-	addr_location_reverse          := st_geomfromgeohash(addr_geohash_reverse);
+	addr_location_reverse          := st_setsrid(st_centroid(st_geomfromgeohash(addr_geohash_reverse)),4326)::geometry;
 	junction_location_hash_reverse := geohash_encode(junction_location_id);
-	junction_location_reverse      := st_geomfromgeohash(junction_location_hash_reverse);
+	junction_location_reverse      := st_setsrid(st_centroid(st_geomfromgeohash(junction_location_hash_reverse)),4326)::geometry;
 	
 ----------------------------------------------------
 
