@@ -60,8 +60,8 @@ DECLARE
 
 BEGIN
 
-    addr_geohash          := st_geohash(this_addr_geom,10);
-    addr_location_id      := geohash_decode(addr_geohash);
+--    addr_geohash          := st_geohash(this_addr_geom,10);
+    addr_location_id      := geohash_decode(st_geohash(this_addr_geom,10));
     select into way_geom_id 
         array[st_astext(way.geom),way.way_id::text]
         from osm.highways way
@@ -69,11 +69,11 @@ BEGIN
         limit 1;
 	way_geom                  := st_setsrid(way_geom_id[1]::geometry,4326);
 	way_id                    := way_geom_id[2]::bigint;
-    junction_location         := st_closestpoint(way_geom, this_addr_geom);
-    junction_location_hash    := st_geohash(junction_location::geometry,10);
-    junction_location_id      := geohash_decode(junction_location_hash);
-	junction_location_hash_reverse := geohash_encode(junction_location_id);
-	junction_location_reverse := st_setsrid(st_centroid(st_geomfromgeohash(junction_location_hash_reverse)),4326)::geometry; -- will be junction_node in the result
+--     junction_location         := st_closestpoint(way_geom, this_addr_geom);
+--     junction_location_hash    := st_geohash(junction_location::geometry,10);
+    junction_location_id      := geohash_decode(st_geohash(st_closestpoint(way_geom, this_addr_geom)::geometry,10));
+-- 	junction_location_hash_reverse := geohash_encode(junction_location_id);
+	junction_location_reverse := st_setsrid(st_centroid(st_geomfromgeohash(geohash_encode(junction_location_id))),4326)::geometry; -- will be junction_node in the result
     junction_edge             := st_setsrid(st_makeline(this_addr_geom, junction_location_reverse),4326);
 
 -- test block for plausibility of hashing operation
