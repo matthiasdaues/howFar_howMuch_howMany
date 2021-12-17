@@ -32,7 +32,20 @@ RETURNS TABLE (
 
 LANGUAGE plpgsql as $$
 
+DECLARE
+    
+	addr_geohash      := st_geohash(this_addr_geom,10);
+    addr_location_id  := geohash_decode(addr_geohash);
+	junction_location := st_closestpoint(way_geom, t_addr_geom)
+
 BEGIN
+
+    select into way_geom 
+        way.geom::geometry
+    from osm.highways way
+    order by this_addr_geom <-> way.geom 
+    limit 1;
+    
     return query
     
 	with address as (
@@ -42,7 +55,7 @@ BEGIN
 	)
     select
         t_addr_id as addr_id
-    ,   geohash_decode(st_geohash(t_addr_geom,10)) as addr_location_id
+    ,   addr_location_id
     ,   geohash_decode(st_geohash(st_closestpoint(way.geom, t_addr_geom::geometry),10)) as junction_location_id
     ,   way.way_id 
     ,   st_makeline(t_addr_geom, st_closestpoint(way.geom, t_addr_geom)) as junction
