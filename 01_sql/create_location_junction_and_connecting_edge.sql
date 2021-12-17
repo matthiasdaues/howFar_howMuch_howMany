@@ -33,7 +33,6 @@ RETURNS TABLE (
 -- ,   junction_location_reverse   geometry
 
 -----------------------------------------------
-
 )
 
 LANGUAGE plpgsql as $$
@@ -58,7 +57,6 @@ DECLARE
 --     addr_location_reverse  geometry;
 
 -----------------------------------------------------
-
 
 BEGIN
 
