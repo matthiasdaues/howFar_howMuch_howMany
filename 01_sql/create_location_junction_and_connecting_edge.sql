@@ -34,14 +34,14 @@ LANGUAGE plpgsql as $$
 
 DECLARE
     
-	addr_geohash      text     
-    addr_location_id  bigint   
-    way_geom          geometry
-	junction_location geometry 
+	addr_geohash           text;     
+    addr_location_id       bigint;   
+    way_geom               geometry;
+	junction_location      geometry; 
+    junction_location_hash text;
+    junction_location_id   bigint;
 
 BEGIN
-
-
 
     addr_geohash          := st_geohash(this_addr_geom,10);
     addr_location_id      := geohash_decode(addr_geohash);
@@ -50,8 +50,10 @@ BEGIN
         from osm.highways way
         order by this_addr_geom <-> way.geom 
         limit 1; 
-    junction_location      := st_closestpoint(way_geom, t_addr_geom)
-    junction_location_hash := st_geohash(junction_location::geometry,10)
+    junction_location      := st_closestpoint(way_geom, t_addr_geom);
+    junction_location_hash := st_geohash(junction_location::geometry,10);
+    junction_location_id   := geohash_decode(junction_location_hash)
+
 
     return query
     
@@ -61,25 +63,12 @@ BEGIN
 		,   this_addr_geom as t_addr_geom
 	)
     select
-        t_addr_id as addr_id
-    ,   addr_location_id
-    ,   geohash_decode(st_geohash(st_closestpoint(way.geom, t_addr_geom::geometry),10)) as junction_location_id
-    ,   way.way_id 
-    ,   st_makeline(t_addr_geom, st_closestpoint(way.geom, t_addr_geom)) as junction
-    ,   st_closestpoint(way.geom, t_addr_geom)::geometry as junction_node
-    from
-        address
-    join lateral (
-    select
-        way.way_id
-    ,   way.geom
-    from
-        osm.highways way
-    order by
-        this_addr_geom <-> way.geom 
-    limit
-        1
-    ) as way on true
+        addr_id 
+    ,   addr_location_id 
+    ,   way_id 
+    ,   junction_location_id 
+    ,   junction_edge 
+    ,   junction_node 
     ;
 	
 END;
