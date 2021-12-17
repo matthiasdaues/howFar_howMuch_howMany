@@ -89,10 +89,10 @@ BEGIN
 
 -- Test block 
 
-    ,   st_distance(this_addr_geom::geography, addr_location_reverse::geography)::numeric as addr_distance
+    ,   st_distance(this_addr_geom::geography, addr_location_reverse::geography)::numeric(10,2) as addr_distance
     ,   this_addr_geom as addr_location
     ,   addr_location_reverse
-    ,   st_distance(junction_location::geography, junction_location_reverse::geography)::numeric as junction_distance
+    ,   st_distance(junction_location::geography, junction_location_reverse::geography)::numeric(10,2) as junction_distance
     ,   junction_location
     ,   junction_location_reverse
 	
