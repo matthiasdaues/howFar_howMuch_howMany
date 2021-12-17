@@ -21,6 +21,18 @@ RETURNS TABLE (
 ,   junction_location_id bigint
 --,   junction_edge geometry
 --,   junction_node geometry
+
+-- Test block ---------------------------------
+
+,   addr_distance numeric(10,2)
+,   addr_location geometry
+,   addr_location_reverse       geometry
+,   junction_distance numeric(10,2)
+,   junction_location
+,   junction_location_reverse   geometry
+
+-----------------------------------------------
+
 )
 
 LANGUAGE plpgsql as $$
@@ -33,6 +45,16 @@ DECLARE
 	junction_location      geometry; 
     junction_location_hash text;
     junction_location_id   bigint;
+
+ -- test block
+
+    addr_geohash_reverse   text;
+    addr_location_reverse  geometry;
+    junction_location_hash_reverse text;
+    junction_location_reverse      geometry;
+
+-----------------------------------------------------
+
 
 BEGIN
 
@@ -50,9 +72,9 @@ BEGIN
 -- test block for plausibility of hashing operation
 
     addr_geohash_reverse           := geohash_encode(addr_location_id)
-	addr_location_reverse          := 
-	junction_location_hash_reverse :=
-	junction_location_reverse      :=
+	addr_location_reverse          := st_geomfromgeohash(addr_geohash_reverse)
+	junction_location_hash_reverse := geohash_encode(junction_location_id)
+	junction_location_reverse      := st_geomfromgeohash(junction_location_hash_reverse)
 	
 ----------------------------------------------------
 
@@ -64,6 +86,18 @@ BEGIN
     ,   junction_location_id 
 --    ,   junction_edge 
 --    ,   junction_node 
+
+-- Test block 
+
+    ,   st_distance(this_addr_geom::geography, addr_location_reverse::geography) as addr_distance
+    ,   this_addr_geom as addr_location
+    ,   addr_location_reverse
+    ,   junction_distance numeric(10,2)
+    ,   junction_location
+    ,   junction_location_reverse   geometry 
+
+---------------------------------------------
+
     ;
 	
 END;
