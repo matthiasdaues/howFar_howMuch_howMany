@@ -6,18 +6,23 @@ This script executes the function create_location_junction.
 
 with input as (
     select
-	    addr_id
-    ,   geom
+	    addr_id as ad
+    ,   geom as ge
 	from
 	    osm.addr_combined
+	order by
+	   random()
 	limit
-	    100000
+	    1000
     )
 select
-    *
+    test.*
 from
     input input
-,   osm.create_location_junction(input.addr_id, input.geom)
+,   osm.create_location_junction(input.ad, input.ge) test
+-- group by
+--     st_geomfromgeohash(geohash_encode(junction_location_id))
+
 
 
 ------------------------------------------
