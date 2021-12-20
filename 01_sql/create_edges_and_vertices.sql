@@ -136,7 +136,7 @@ BEGIN
     
     select
         this_way_id as way_id
-    ,   properties ->> 
+    ,   st_geomfromgeojson(edge_geom) 
 	from
 	    jsonb_array_elements(edges)
 	
