@@ -36,7 +36,7 @@ WITH segments AS (
             (select geom from osm.boundaries where area_id = -180627) as selector
         inner join 
             osm.highways roads on ST_Intersects(selector.geom, roads.geom)
-         ) as clipped
+         )   as clipped
     where ST_Dimension(clipped.clipped_geom) = 1
          ) as dumps
     )
