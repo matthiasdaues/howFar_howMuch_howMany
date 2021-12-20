@@ -27,7 +27,7 @@ WITH segments AS (
                  ,   'name'
                  ,   name                 )
              ) as properties
-         ,   ST_DumpPoints(clipped_geom) AS pt 
+         ,        clipped_geom) AS pt 
     from 
         (select 
             roads.*
