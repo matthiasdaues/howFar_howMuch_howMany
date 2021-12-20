@@ -22,13 +22,17 @@ CREATE OR REPLACE FUNCTION osm.create_location_junction(
 )
 
 RETURNS TABLE (
-    from_node ID             bigint
-,   from_node geometry       geometry
-,   to_node ID               geometry
-,   to_node geometry         geometry
-,   edge geometry            geometry
-,   edge properties          jsonb
-,   edge ID                  bigint
+--     from_node ID             bigint
+-- ,   from_node geometry       geometry
+-- ,   to_node ID               geometry
+-- ,   to_node geometry         geometry
+-- ,   edge geometry            geometry
+-- ,   edge properties          jsonb
+-- ,   edge ID                  bigint
+        this_way_id             bigint
+    ,   way_geom                geometry
+    ,   junction_points         geometry
+    ,   way_geom_enhanced_dump  text
 )
 
 -- Test block ---------------------------------
@@ -49,7 +53,7 @@ DECLARE
     
     way_geom                 geometry;
     junction_points          geometry;
-    way_geom_enhanced        geometry;
+    way_geom_enhanced_dump   geometry;
 
 
 
@@ -73,33 +77,21 @@ BEGIN
         )
         where way_id = this_way_id
         ;
-    way_geom_enhanced := st_snap(way_geom, junction_points, 0.5)::geometry;
-    way_geom_dump     := 
+    way_geom_enhanced_dump := st_dump(st_astext(st_snap(way_geom, junction_points, 0.5)::geometry));
 
---     junction_location         := st_closestpoint(way_geom, this_addr_geom);
---     junction_location_hash    := st_geohash(junction_location::geometry,10);
-    junction_location_id      := geohash_decode(st_geohash(st_closestpoint(way_geom, this_addr_geom)::geometry,10));
--- 	junction_location_hash_reverse := geohash_encode(junction_location_id);
-	junction_location_reverse := st_setsrid(st_centroid(st_geomfromgeohash(geohash_encode(junction_location_id))),4326)::geometry; -- will be junction_node in the result
-    junction_edge             := st_setsrid(st_makeline(this_addr_geom, junction_location_reverse),4326);
 
 -- test block for plausibility of hashing operation
 
---  addr_geohash_reverse           := geohash_encode(addr_location_id);
--- 	addr_location_reverse          := st_setsrid(st_centroid(st_geomfromgeohash(addr_geohash_reverse)),4326)::geometry;
 	
 ----------------------------------------------------
 
     return query
     
     select
-        this_addr_id as addr_id 
-	,   way_id
-    ,   addr_location_id
-	,   addr_location
-    ,   junction_location_id 
-    ,   junction_edge 
-    ,   junction_location_reverse as junction_node 
+        this_way_id 
+    ,   way_geom
+    ,   junction_points
+    ,   way_geom_enhanced_dump
 
 -- Test block 
 
