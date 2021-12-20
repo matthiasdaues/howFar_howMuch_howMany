@@ -67,8 +67,6 @@ BEGIN
 				  ,   json_build_object(
 				 	      'way_id'
 				      ,   way.way_id
-				 	  ,   'length'
-					  ,   round(st_length(way.geom::geography)::numeric,2)
 					  ,   'type'
 					  ,   way.type
 					  ,   'surface'
@@ -97,21 +95,26 @@ BEGIN
     WITH segments AS (
  		SELECT 
  			ST_AsText(ST_MakeLine(lag((pt).geom, 1, NULL) OVER (PARTITION BY way_id ORDER BY way_id, (pt).path), (pt).geom)) AS edge
- 		FROM 
+ 		,   round(st_length(st_setsrid(ST_MakeLine(lag((pt).geom, 1, NULL) OVER (PARTITION BY way_id ORDER BY way_id, (pt).path), (pt).geom),4326)::geography)::numeric(10,2),2)::text as length
+		FROM 
             ST_DumpPoints((way_geom_enhanced_dump).geom) AS pt 
 		)
  	SELECT into edges
 	    jsonb_agg(
 			jsonb_build_object(
 			'from_node_id'
-		,   geohash_decode(st_geohash(st_pointn(a.edge,1),10))::text  -- from_node_id
-		,   'from_node_geom'
-		,	st_setsrid(st_centroid(st_geomfromgeohash(st_geohash(st_pointn(a.edge,1),10))),4326)::geometry  -- from_node_geom
-		,   'edge_geom'
-		,	st_setsrid(a.edge,4326)     -- edge_geom
-		,   'properties'
-		,   properties::jsonb
-			)
+		    ,   geohash_decode(st_geohash(st_pointn(a.edge,1),10))::text  -- from_node_id
+		    ,   'from_node_geom'
+		    ,	st_setsrid(st_centroid(st_geomfromgeohash(st_geohash(st_pointn(a.edge,1),10))),4326)::geometry  -- from_node_geom
+		    ,   'edge_geom'
+		    ,	st_setsrid(a.edge,4326)     -- edge_geom
+	      	,   'properties'
+		    ,   jsonb_insert(
+		            properties
+				,   '{length}'
+				,   a.length::jsonb
+			    )
+		    )	
 		)
 	FROM 
 		segments a
