@@ -47,18 +47,8 @@ LANGUAGE plpgsql as $$
 
 DECLARE
     
-	addr_geohash           text;  
-	addr_location          geometry;
-    addr_location_id       bigint;   
-	way_geom_id            text[];
-    way_geom               geometry;
-	way_id                 bigint;
-	junction_location      geometry; 
-    junction_location_hash text;
-    junction_location_id   bigint;
-	junction_edge          geometry;
-	junction_location_hash_reverse text;
-    junction_location_reverse      geometry;
+    this_way_geom            geometry;
+    
 
  -- test block
 
