@@ -47,9 +47,10 @@ LANGUAGE plpgsql as $$
 
 DECLARE
     
-    this_way_geom            geometry;
+    way_geom                 geometry;
+    way_id                   bigint;
     junction_points          geometry;
-    
+
 
 
  -- test block
@@ -61,9 +62,6 @@ DECLARE
 
 BEGIN
 
---    addr_geohash          := st_geohash(this_addr_geom,10);
-    addr_location_id      := geohash_decode(st_geohash(this_addr_geom,10));
-	addr_location         := st_setsrid(st_centroid(st_geomfromgeohash(st_geohash(this_addr_geom,10))),4326)::geometry;
     select into way_geom_id 
         array[st_astext(way.geom),way.way_id::text]
         from osm.highways way
