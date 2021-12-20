@@ -48,8 +48,8 @@ LANGUAGE plpgsql as $$
 DECLARE
     
     way_geom                 geometry;
-    way_id                   bigint;
     junction_points          geometry;
+    way_geom_enhanced        geometry;
 
 
 
@@ -61,14 +61,20 @@ DECLARE
 -----------------------------------------------------
 
 BEGIN
-
-    select into way_geom_id 
-        array[st_astext(way.geom),way.way_id::text]
+    
+    select into way_geom
+        way.geom::geometry
         from osm.highways way
-        order by this_addr_geom <-> way.geom 
-        limit 1;
-	way_geom                  := st_setsrid(way_geom_id[1]::geometry,4326);
-	way_id                    := way_geom_id[2]::bigint;
+        where way_id = this_way_id
+        ;
+    select into junction_points
+        st_union(
+            junction_node::geometry
+        )
+        where way_id = this_way_id
+        ;
+    way_geom_enhanced := st_snap(way_geom, junction_points, 0.5)::geometry;
+    
 --     junction_location         := st_closestpoint(way_geom, this_addr_geom);
 --     junction_location_hash    := st_geohash(junction_location::geometry,10);
     junction_location_id      := geohash_decode(st_geohash(st_closestpoint(way_geom, this_addr_geom)::geometry,10));
