@@ -136,12 +136,9 @@ BEGIN
     
     select
         this_way_id as way_id
---    ,   way_geom
---    ,   junction_points
---    ,   way_geom_enhanced
---	,   properties
---	,   st_setsrid(unnest(edges[2]),4326) as edge
-    ,   edges
+    ,   properties ->> 
+	from
+	    jsonb_array_elements(edges)
 	
 
 -- Test block 
