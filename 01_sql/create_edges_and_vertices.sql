@@ -48,7 +48,9 @@ LANGUAGE plpgsql as $$
 DECLARE
     
     this_way_geom            geometry;
+    junction_points          geometry;
     
+
 
  -- test block
 
