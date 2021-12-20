@@ -15,7 +15,7 @@ The function returns the
 
 */
 
-DROP FUNCTION osm.create_edges_and_vertices(bigint);
+DROP FUNCTION osm.  (bigint);
 
 CREATE OR REPLACE FUNCTION osm.create_location_junction(
     this_way_id bigint
