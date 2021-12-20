@@ -74,7 +74,8 @@ BEGIN
         where way_id = this_way_id
         ;
     way_geom_enhanced := st_snap(way_geom, junction_points, 0.5)::geometry;
-    
+    way_geom_dump     := 
+
 --     junction_location         := st_closestpoint(way_geom, this_addr_geom);
 --     junction_location_hash    := st_geohash(junction_location::geometry,10);
     junction_location_id      := geohash_decode(st_geohash(st_closestpoint(way_geom, this_addr_geom)::geometry,10));
