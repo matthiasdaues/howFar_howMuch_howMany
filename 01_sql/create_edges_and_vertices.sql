@@ -29,7 +29,12 @@ CREATE OR REPLACE FUNCTION osm.create_edges_and_vertices(
 --	,   junction_points geometry
 --	,   way_geom_enhanced geometry
 --	,   properties jsonb
+	,   from_node_id bigint
+    ,   from_node_geom geometry
+	,   to_node_id bigint
+	,   to_node_geom geometry
 	,   edges_geom geometry
+	,   edge_properties jsonb
 	) 
     LANGUAGE 'plpgsql'
     COST 100
@@ -136,15 +141,40 @@ BEGIN
     
     select
         this_way_id as way_id
+	,   replace((jsonb_path_query(
+	        edges.edges
+		,   '$.from_node_id'
+	    )::text),'"','')::bigint as from_node_id
+	,   st_geomfromgeojson(jsonb_path_query(
+	        edges.edges
+		,   '$.from_node_geom'
+	    )::jsonb)::geometry as from_node_geom
+	,   replace((jsonb_path_query(
+	        edges.edges
+		,   '$.to_node_id'
+	    )::text),'"','')::bigint as to_node_id
+	,   st_geomfromgeojson(jsonb_path_query(
+	        edges.edges
+		,   '$.to_node_geom'
+	    )::jsonb)::geometry as to_node_geom
     ,   st_geomfromgeojson(jsonb_path_query(
-        edges, 
-        '$.edge_geom'
+            edges.edges 
+        ,   '$.edge_geom'
         )::jsonb)::geometry as edge_geom
+	,   jsonb_path_query(
+	        edges.edges
+		,   '$.properties'
+	    )::jsonb as edge_properties
 	from
-	    jsonb_array_elements(edges)
-
-
--- BUG: Hier entstehen Dubletten!!!!!!
+	    (select edges) edges
+		
+-- from_node ID             (bigint)
+-- from_node geometry       (geometry)
+-- to_node ID               (geometry)
+-- to_node geometry         (geometry)
+-- edge geometry            (geometry)
+-- edge properties          (jsonb)
+-- edge ID                  (bigint)
 
 -- Test block 
 
