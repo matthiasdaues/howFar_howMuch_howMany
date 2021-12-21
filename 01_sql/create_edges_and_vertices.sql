@@ -34,6 +34,7 @@ CREATE OR REPLACE FUNCTION osm.create_edges_and_vertices(
 	,   to_node_id bigint
 	,   to_node_geom geometry
 	,   edges_geom geometry
+	,   edge_id bigint
 	,   edge_properties jsonb
 	) 
     LANGUAGE 'plpgsql'
@@ -161,6 +162,10 @@ BEGIN
             edges.edges 
         ,   '$.edge_geom'
         )::jsonb)::geometry as edge_geom
+    ,   geohash_decode(st_geohash(st_lineinterpolatepoint(st_geomfromgeojson(jsonb_path_query(
+            edges.edges 
+        ,   '$.edge_geom'
+        )::jsonb)::geometry,0.50),10)) as edge_id
 	,   jsonb_path_query(
 	        edges.edges
 		,   '$.properties'
