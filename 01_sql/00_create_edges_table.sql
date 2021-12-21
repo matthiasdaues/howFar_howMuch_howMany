@@ -1,4 +1,4 @@
-drop table if exists osm.junctions cascade;
+drop table if existsosm.junctions cascade;
 create table osm.edges (
   	edge_id    bigint
 ,   to_node    bigint
