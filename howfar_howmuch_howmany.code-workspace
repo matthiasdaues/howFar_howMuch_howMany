@@ -2,6 +2,9 @@
     "folders": [
         {
             "path": "."
+        },
+        {
+            "path": "../../geo_experimente/osm/OSM"
         }
     ]
 }
