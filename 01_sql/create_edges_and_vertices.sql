@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION osm.create_edges_and_vertices(
 --	,   junction_points geometry
 --	,   way_geom_enhanced geometry
 --	,   properties jsonb
-	,   edges jsonb
+	,   edges_geom geometry
 	) 
     LANGUAGE 'plpgsql'
     COST 100
@@ -136,10 +136,15 @@ BEGIN
     
     select
         this_way_id as way_id
-    ,   st_geomfromgeojson(edge_geom) 
+    ,   st_geomfromgeojson(jsonb_path_query(
+        edges, 
+        '$.edge_geom'
+        )::jsonb)::geometry as edge_geom
 	from
 	    jsonb_array_elements(edges)
-	
+
+
+-- BUG: Hier entstehen Dubletten!!!!!!
 
 -- Test block 
 
