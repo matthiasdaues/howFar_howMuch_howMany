@@ -1,8 +1,8 @@
-drop table if existsosm.junctions cascade;
+drop table if existsosm.edges cascade;
 create table osm.edges (
   	edge_id    bigint
-,   to_node    bigint
-,   from_node  bigint
+,   from_node    bigint
+,   to_node  bigint
 ,   geom       geometry(LineString,4326)
 ,   properties jsonb
 ,   valid_from date
@@ -20,20 +20,51 @@ truncate table osm.junctions;
 
 with input as (
     select
-	    addr_id as ad
-    ,   geom as ge
+	    way_id as way
 	from
-	    osm.addr_combined
---	order by
---	   random()
---	limit
---	    1
+	    osm.junctions
+	where
+	    way_id = 22907279
+	group by
+	    way_id
+	-- order by
+	--    random()
+    -- limit
+	--     random()*10000
     )
-insert into osm.junctions
+insert into osm.edges
 select
-    test.*
+    test.edge_id
+,   test.from_node_id as from_node
+,   test.to_node_id as to_node
+,   test.edge_geom as geom
+,   test.edge_properties as properties
+,   NULL as valid_from
+,   NULL as valid_to
+
 from
     input input
-,   osm.create_location_junction(input.ad, input.ge) test
--- group by
---     st_geomfromgeohash(geohash_encode(junction_location_id))
+,   osm.create_edges_and_vertices(input.way) test
+
+union all 
+
+select 
+
+    geohash_decode(
+        st_geohash(
+            st_lineinterpolatepoint(
+                junction_edge::geometry,0.5
+            ),10
+        )
+    ) as edge_id                                   
+,   addr_location_id as from_node
+,   junction_location_id as to_node
+,   junction_edge as geom
+,   NULL as properties
+,   NULL as valid_from
+,   NULL as valid_to
+
+from
+   osm.junctions 
+where
+   way_id = 22907279

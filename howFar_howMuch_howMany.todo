@@ -1,6 +1,7 @@
 ## fundamentals:
     [ ] research geohash in postgis
     [ ] find way to create a (big)int geohash or hilbert hash in postgres
+    [ ] junction_id analog zur edge_id konstruieren, als geohash-ID des Mittelpunkts der Linie (interpoliert bei 50% der Länge)
 
 ## operations:
 
