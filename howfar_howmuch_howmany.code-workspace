@@ -6,5 +6,29 @@
         {
             "path": "../../geo_experimente/osm/OSM"
         }
-    ]
+    ],
+    "settings": {
+        "sqltools.connections": [
+            {
+                "previewLimit": 50,
+                "server": "79.143.178.253",
+                "port": 5432,
+                "driver": "PostgreSQL",
+                "name": "gis@contabo",
+                "database": "gis",
+                "username": "gis",
+                "password": "HeWhoBuildsTheLand"
+            },
+            {
+                "previewLimit": 50,
+                "server": "localhost",
+                "port": 25432,
+                "driver": "PostgreSQL",
+                "name": "gis@localhost",
+                "database": "gis",
+                "username": "gis",
+                "password": "HeWhoBuildsTheLand"
+            }
+        ]
+    }
 }
