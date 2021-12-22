@@ -3,7 +3,7 @@ select
 from
     osm.boundaries
 where (
-        tags ->> 'name' in ('%amburg%','%erlin%')
+        tags ->> 'name'  ('%amburg%', '%erlin%')
     and 
         tags ->> 'admin_level' = '4'
     )
