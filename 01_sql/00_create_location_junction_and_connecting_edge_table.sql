@@ -19,11 +19,14 @@ with input as (
 	    addr_id as ad
     ,   geom as ge
 	from
-	    osm.addr_combined
+	    osm.addr_combined ac
+	where
+	    ac.geom && (select geom from osm.boundaries where tags ->> 'admin_level' = '4' and tags ->> 'name' like '%erlin%')
+	    
 --	order by
 --	   random()
-	limit
-	    1
+-- 	limit
+-- 	    1
     )
 insert into osm.junctions
 select
