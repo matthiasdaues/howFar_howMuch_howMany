@@ -1,12 +1,12 @@
 ## fundamentals:
     [ ] research geohash in postgis
-    [ ] find way to create a (big)int geohash or hilbert hash in postgres
+    [x] find way to create a (big)int geohash or hilbert hash in postgres @done(21-12-22 18:43)
     [ ] junction_id analog zur edge_id konstruieren, als geohash-ID des Mittelpunkts der Linie (interpoliert bei 50% der Länge)
 
 ## operations:
 
 ## osm-import: 
-    [ ] create address coordinates from nodes, ways and relations
+    [x] create address coordinates from nodes, ways and relations @done(21-12-22 18:43)
     [ ] filter polygons that have an address but are not buildings (cemetaries, e.g.)
 
 ## road network: 
@@ -15,3 +15,5 @@
 
 ## projection / coordinate system: 
     [ ] calculate closest point on utm32? Things look skewed at the moment
+
+## 
