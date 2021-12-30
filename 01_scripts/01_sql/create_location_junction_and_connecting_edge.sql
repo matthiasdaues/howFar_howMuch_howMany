@@ -19,6 +19,7 @@ RETURNS TABLE (
 	addr_id bigint
 ,   way_id bigint
 ,   addr_location_id bigint
+,   addr_node geometry
 ,   junction_location_id bigint
 ,   junction_edge geometry
 ,   junction_node geometry
@@ -41,6 +42,7 @@ DECLARE
     
 	addr_geohash           text;     
     addr_location_id       bigint;   
+    addr_location_reverse  geometry;
 	way_geom_id            text[];
     way_geom               geometry;
 	way_id                 bigint;
@@ -60,8 +62,9 @@ DECLARE
 
 BEGIN
 
---    addr_geohash          := st_geohash(this_addr_geom,10);
-    addr_location_id      := geohash_decode(st_geohash(this_addr_geom,10));
+--    addr_geohash               := st_geohash(this_addr_geom,10);
+    addr_location_id          := geohash_decode(st_geohash(this_addr_geom,10));
+    addr_location_reverse     := st_setsrid(st_centroid(st_geomfromgeohash(geohash_encode(addr_location_id))),4326)::geometry; -- will be addr_node in the result
     select into way_geom_id 
         array[st_astext(way.geom),way.way_id::text]
         from osm.highways way
@@ -74,7 +77,7 @@ BEGIN
     junction_location_id      := geohash_decode(st_geohash(st_closestpoint(way_geom, this_addr_geom)::geometry,10));
 -- 	junction_location_hash_reverse := geohash_encode(junction_location_id);
 	junction_location_reverse := st_setsrid(st_centroid(st_geomfromgeohash(geohash_encode(junction_location_id))),4326)::geometry; -- will be junction_node in the result
-    junction_edge             := st_setsrid(st_makeline(this_addr_geom, junction_location_reverse),4326);
+    junction_edge             := st_setsrid(st_makeline(addr_location_reverse, junction_location_reverse),4326);
 
 -- test block for plausibility of hashing operation
 
@@ -89,6 +92,7 @@ BEGIN
         this_addr_id as addr_id 
 	,   way_id
     ,   addr_location_id
+    ,   addr_location_reverse AS addr_node
     ,   junction_location_id 
     ,   junction_edge 
     ,   junction_location_reverse as junction_node 

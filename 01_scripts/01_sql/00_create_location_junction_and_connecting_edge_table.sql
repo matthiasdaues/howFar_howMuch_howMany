@@ -1,18 +1,19 @@
--- drop table osm.junctions cascade;
--- create table osm.junctions (
---   	addr_id bigint
--- ,   way_id bigint
--- ,   addr_location_id bigint
--- ,   junction_location_id bigint
--- ,   junction_edge geometry
--- ,   junction_node geometry
---     );
+drop table osm.junctions cascade;
+create table osm.junctions (
+  	addr_id bigint
+,   way_id bigint
+,   addr_location_id bigint
+,   addr_node geometry
+,   junction_location_id bigint
+,   junction_edge geometry
+,   junction_node geometry
+    );
 
 
--- create index junction_addr_id_idx on osm.junctions using btree (addr_id);
--- create index junction_way_id_idx on osm.junctions using btree (way_id);
+create index junction_addr_id_idx on osm.junctions using btree (addr_id);
+create index junction_way_id_idx on osm.junctions using btree (way_id);
 
-truncate table osm.junctions;
+--truncate table osm.junctions;
 
 with input as (
     select
@@ -21,7 +22,7 @@ with input as (
 	from
 	    osm.addr_combined ac
 	where
-	    ac.geom && (select geom from osm.boundaries where tags ->> 'admin_level' = '4' and tags ->> 'name' like '%erlin%')
+	    ac.geom && (select geom from osm.boundaries where tags ->> 'admin_level' = '4' and tags ->> 'name' like '%ambur%')
 	    
 --	order by
 --	   random()
@@ -33,6 +34,7 @@ select
     test.addr_id
 ,   test.way_id
 ,   test.addr_location_id
+,   test.addr_node
 ,   test.junction_location_id
 ,   test.junction_edge
 ,   test.junction_node
