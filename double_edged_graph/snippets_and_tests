@@ -1,0 +1,36 @@
+with input_node as (
+    select
+        geohash_decode(st_geohash((st_dumppoints(a.geom)).geom,10)) as node_id
+    ,   st_setsrid(st_centroid(st_geomfromgeohash(geohash_encode(geohash_decode(st_geohash((st_dumppoints(a.geom)).geom,10))))),4326)::geometry as hash_geom
+    ,   (st_dumppoints(a.geom)).geom as geom
+    ,   st_buffer((st_dumppoints(a.geom)).geom::geography,1)::geometry as buffer
+    from 
+        (select
+            way_id
+        ,   geom
+        from
+            osm.highways a
+        limit
+            100000
+        ) a
+    --limit 1
+    )
+select
+    i.geom
+,   i.node_id
+,   i.hash_geom  
+,   array_agg(
+        jsonb_build_array(h.way_id,h."type",h."name",h.surface) 
+    )
+,   st_length(st_makeline(i.geom,i.hash_geom)::geography) as displacement
+from 
+    osm.highways h
+,   input_node i
+where 
+    i.buffer && h.geom
+group by 
+    i.node_id
+,   i.hash_geom 
+,   i.geom
+,   st_makeline(i.geom,i.hash_geom)
+;
