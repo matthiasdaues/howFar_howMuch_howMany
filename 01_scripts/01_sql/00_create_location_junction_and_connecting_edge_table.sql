@@ -1,5 +1,5 @@
-drop table osm.junctions cascade;
-create table osm.junctions (
+--drop table osm.junctions cascade;
+create table osm.junctions_dev (
   	addr_id bigint
 ,   way_id bigint
 ,   addr_location_id bigint
@@ -22,14 +22,14 @@ with input as (
 	from
 	    osm.addr_combined ac
 	where
-	    ac.geom && (select geom from osm.boundaries where tags ->> 'admin_level' = '4' and tags ->> 'name' like '%ambur%')
+	    ac.geom && (select geom from osm.boundaries where tags ->> 'admin_level' = '4' and tags ->> 'name' like '%ürzbur%')
 	    
 --	order by
 --	   random()
 -- 	limit
 -- 	    1
     )
-insert into osm.junctions
+insert into osm.junctions_dev
 select
     test.addr_id
 ,   test.way_id

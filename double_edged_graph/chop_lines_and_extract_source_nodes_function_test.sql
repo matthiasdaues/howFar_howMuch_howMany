@@ -1,31 +1,28 @@
 with input as (
     select
-	    way_id
---	,   array_agg(junction_location_id) as junction_location_id
-	,   st_union(junction_node) as nodes
-	,   st_union(junction_edge)
-	from
-	    osm.junctions
-	group by
-	    way_id
-	limit
-	    1
+        ((st_dumppoints(a.geom)).geom) as this_node_geom
+    ,   way_id as this_way_id
+    ,   unnest((st_dumppoints(a.geom)).path) as this_node_index
+    from 
+        (select
+            way_id
+        ,   geom
+        from
+            osm.double_edged_graph_dev 
+--        order by
+--            random()
+        limit 1
+        ) a
+    --limit 1
     )
 select
-    st_snap(
-        res.geom
-	,   grafts.nodes
-	,   0.5
-	)::geometry as new_road
+    output.*
+--,   sum(cardinality(output.source_node_buffer_splits))
 from
-    grafts grafts
-join lateral
-    (select
-	    h.way_id
-	,   h.geom
-	from
-	    osm.highways h
-	where
-	    grafts.way_id = h.way_id
-	) res on true
-;
+    input input
+,   osm.chop_lines_and_extract_nodes(
+        input.this_way_id              
+    ,   input.this_node_index         
+    ,   input.this_node_geom
+    ) output
+    

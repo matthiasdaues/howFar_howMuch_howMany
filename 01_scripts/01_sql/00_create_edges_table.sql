@@ -1,55 +1,26 @@
---drop table if exists osm.edges cascade;
--- create table osm.edges (
---   	edge_id    bigint
--- ,   from_node    bigint
--- ,   to_node  bigint
--- ,   geom       geometry(LineString,4326)
--- ,   properties jsonb
--- ,   valid_from date
--- ,   valid_to   date
--- )
--- ;
+drop table if exists osm.edges_dev cascade;
+create table osm.edges_dev (
+   	edge_id    bigint
+ ,   from_node    bigint
+ ,   to_node  bigint
+ ,   geom       geometry(LineString,4326)
+ ,   properties jsonb
+ ,   valid_from date
+ ,   valid_to   date
+ )
+ ;
 
 
--- create index edge_id_idx on osm.edges using btree (edge_id);
--- create index edge_from_node_id_idx on osm.edges using btree (from_node);
--- create index edge_to_node_id_idx on osm.edges using btree (to_node);
--- create index edge_geom_idx on osm.edges using gist (geom);
+ create index edge_dev_id_idx on osm.edges_dev using btree (edge_id);
+ create index edge_dev_from_node_id_idx on osm.edges_dev using btree (from_node);
+ create index edge_dev_to_node_id_idx on osm.edges_dev using btree (to_node);
+ create index edge_dev_geom_idx on osm.edges_dev using gist (geom);
 
-truncate table osm.edges;
+--truncate table osm.edges;
 
-with input as (
-    select
-	    way_id as way
-	from
-	    osm.junctions
--- 	where
--- 	    way_id = 22907279
-	group by
-	    way_id
-	-- order by
-	--    random()
-    -- limit
-	--     random()*10000
-    )
-insert into osm.edges
-select
-    test.edge_id
-,   test.from_node_id as from_node
-,   test.to_node_id as to_node
-,   test.edge_geom as geom
-,   test.edge_properties as properties
--- ,   0 as valid_from
--- ,   0 as valid_to
-
-from
-    input input
-,   osm.create_edges_and_vertices(input.way) test
-
+ql
 union all 
-
-select 
-
+select
     geohash_decode(
         st_geohash(
             st_lineinterpolatepoint(
@@ -63,8 +34,7 @@ select
 ,   null as properties
 -- ,   0 as valid_from
 -- ,   0 as valid_to
-
 from
-   osm.junctions 
+   osm.junctions_dev 
 -- where
 --    way_id = 22907279

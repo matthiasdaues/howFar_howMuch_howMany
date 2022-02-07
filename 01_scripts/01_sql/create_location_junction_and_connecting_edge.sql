@@ -8,7 +8,7 @@ geohash based ids of the points and the respective way_id (edge_id).
 
 */
 
-DROP FUNCTION osm.create_location_junction(bigint, geometry);
+--DROP FUNCTION osm.create_location_junction(bigint, geometry);
 
 CREATE OR REPLACE FUNCTION osm.create_location_junction(
     this_addr_id bigint	
