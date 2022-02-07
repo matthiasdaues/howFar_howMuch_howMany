@@ -74,15 +74,16 @@ BEGIN
 					  ,   'surface'
 					  ,   way.surface
 					  ,   'name'
-					  ,   way.name                 )
+					  ,   way.name                 
+					  )
 				  ) 
-        from osm.highways way
+        from osm.highways_dev way
         where way.way_id = this_way_id
 	    ;
 		
     select into way_geom
         way.geom::geometry
-        from osm.highways way
+        from osm.highways_dev way                             /* todo: adapt source to prod */
         where way.way_id = this_way_id
         ;
 		
@@ -90,7 +91,7 @@ BEGIN
         st_union(
             junction_node::geometry
         )
-		from osm.junctions junctions
+		from osm.junctions_dev junctions
         where junctions.way_id = this_way_id
         ;
 		

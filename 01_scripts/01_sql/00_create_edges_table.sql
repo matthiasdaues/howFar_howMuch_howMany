@@ -18,8 +18,36 @@ create table osm.edges_dev (
 
 --truncate table osm.edges;
 
-ql
+with input as (
+    select
+        way_id as way
+    from
+        osm.highways_dev
+--  where
+--      way_id = 22907279
+    group by
+        way_id
+    -- order by
+    --    random()
+    -- limit
+    --     random()*10000
+    )
+--insert into osm.edges_dev
+select
+    test.edge_id
+,   test.from_node_id as from_node
+,   test.to_node_id as to_node
+,   test.edge_geom as geom
+,   test.edge_properties as properties
+-- ,   0 as valid_from
+-- ,   0 as valid_to
+
+from
+    input input
+,   osm.create_edges_and_vertices(input.way) test
+
 union all 
+
 select
     geohash_decode(
         st_geohash(
