@@ -1,6 +1,6 @@
 drop table if exists osm.edges_dev cascade;
 create table osm.edges_dev (
-   	edge_id    bigint
+    edge_id    bigint
  ,   from_node    bigint
  ,   to_node  bigint
  ,   geom       geometry(LineString,4326)
