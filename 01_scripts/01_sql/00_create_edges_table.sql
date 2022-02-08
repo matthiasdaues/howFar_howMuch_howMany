@@ -32,7 +32,7 @@ with input as (
     -- limit
     --     random()*10000
     )
---insert into osm.edges_dev
+insert into osm.edges_dev
 select
     test.edge_id
 ,   test.from_node_id as from_node
