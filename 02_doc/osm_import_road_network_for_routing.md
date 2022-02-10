@@ -1,27 +1,6 @@
 # steps towards a routing enabled road network
 
-1. import all highways with type, name and surface tags as attributes
-   1. scripts
-      1. 
-2. add the area_type attribute for all non-road-types by
-   1. find the st_intersects spatial relation to enclosing features and
-      1. adding the "landuse" tag
-      2. adding the "leisure" tag
-      3. adding the tags as arrays to compensate for paths crossing several type areas
-3. create the "junction"-data set
-4. analyze all roads / paths that are not identified as nearest road and
-   1. cut them into "real" graph edges
-   2. identify all nodes with degree 2
-   3. collapse all continuous connections between nodes of degree 3 into edges by
-      1. adding the length of the constituent edges
-      2. collecting the node_ids with degree 2 into an array ordered by path index
-      3. collecting the edge geometries into a geometry collection of linestring primitives
-5. !! as an alternative to 2.1 all non-road-types that are not nearest line to an address coordinate could be eliminated from step 4
-
-As a result we should have a detailed road network graph in residential areas whose fine grained near-terminus parts are connected with long ranging logical edges in non-residential areas.
-
-_____________________
-
+## I. Creating the "Transport Graph"
 
 1. import all highways with type, name and surface tags as attributes
    1. scripts
@@ -42,4 +21,22 @@ _____________________
 4. Duplication
    1. duplicate all edges with tag = 1
    2. construct intersections with all edges having tag = 0
-5. 
+
+## II. Creating the "Access Graph"
+
+1. build the junctions from road to address
+   1. find the neares edge
+   2. graft the touchpoint into the edge
+   3. segment the enhanced edge
+
+## III. Create a simplified logical graph
+
+1. identify nodes having degree = 2
+2. collaps contiguous edges consisting of such nodes into one logical edge
+      1. add the length of the constituent edges
+      2. collect the node_ids with degree 2 into an array ordered by path index
+3. collect the edge geometries into a geometry collection of linestring primitives
+
+The result of this sketched out process will be a detailed road network graph. In residential areas it will be a fine grained street side differentiating routing network. Those fine grained near-terminus parts will be connected with far ranging logical edges in non-residential areas. 
+
+The routing will be calculated on the logical edges only. The dataset will preserve the prior geometry as a geometry array or multigeometry, thus combining a logical network with its physical representation within one data structure.
