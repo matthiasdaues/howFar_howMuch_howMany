@@ -35,4 +35,8 @@ _____________________
    1. road type
    2. area type
    3. e.g.: footpath in non-residential areas like cemetaries / parks, cycle way
-   4. ruleset:
+   4. ruleset: tbd
+   5. doubling-tag: 
+      1. one-sided = 0
+      2. to double = 1
+4. 
