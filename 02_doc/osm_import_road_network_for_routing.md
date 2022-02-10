@@ -3,8 +3,6 @@
 ## I. Creating the "Transport Graph"
 
 1. import all highways with type, name and surface tags as attributes
-   1. scripts
-      1. 
 2. add the area_type attribute for all non-road-types by
    1. find the st_intersects spatial relation to enclosing features and
       1. adding the "landuse" tag
