@@ -39,4 +39,7 @@ _____________________
    5. doubling-tag: 
       1. one-sided = 0
       2. to double = 1
-4. 
+4. Duplication
+   1. duplicate all edges with tag = 1
+   2. construct intersections with all edges having tag = 0
+5. 
