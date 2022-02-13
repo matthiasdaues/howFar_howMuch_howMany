@@ -136,8 +136,17 @@ begin
                                             end
     ;
 
-    /* extending the edge to 
-    
+    /* extending the edge to get azimuth */
+    --SELECT ST_MakeLine(ST_TRANSLATE(a, sin(az1) * len, cos(az1) * 
+--len),ST_TRANSLATE(b,sin(az2) * len, cos(az2) * len))
+--
+--  FROM (
+--    SELECT a, b, ST_Azimuth(a,b) AS az1, ST_Azimuth(b, a) AS az2, ST_Distance(a,b) + 1000 AS len
+--      FROM (
+--        SELECT ST_StartPoint(the_geom) AS a, ST_EndPoint(the_geom) AS b
+--          FROM ST_MakeLine(ST_MakePoint(1,2), ST_MakePoint(3,4)) AS the_geom
+--    ) AS sub
+--) AS sub2
     
     /* return the process results */
     return query

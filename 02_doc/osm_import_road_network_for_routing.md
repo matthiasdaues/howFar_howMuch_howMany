@@ -5,9 +5,9 @@
 1. import all highways with type, name and surface tags as attributes
 2. add the area_type attribute for all non-road-types by
    1. find the st_intersects spatial relation to enclosing features and
-      1. adding the "landuse" tag
-      2. adding the "leisure" tag
-      3. adding the tags as arrays to compensate for paths crossing several type areas
+      1. add the "landuse" tag
+      2. add the "leisure" tag
+      3. add the tags as arrays to compensate for paths crossing several type areas
 3. Prune the road network based on 
    1. road type
    2. area type
@@ -20,10 +20,15 @@
    1. duplicate all edges with tag = 1
    2. construct intersections with all edges having tag = 0
 
+### Functions and order of execution
+
+1. 
+2. chop_lines_and_extract_nodes
+
 ## II. Creating the "Access Graph"
 
 1. build the junctions from road to address
-   1. find the neares edge
+   1. find the nearest edge
    2. graft the touchpoint into the edge
    3. segment the enhanced edge
 
