@@ -14,7 +14,7 @@ with input_node as (
             osm.double_edged_graph_dev 
         --limit 1
         ) a
-    --limit 1
+    limit 1
     )
 select
     i.node_id

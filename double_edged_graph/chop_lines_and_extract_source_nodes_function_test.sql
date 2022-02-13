@@ -8,15 +8,16 @@ with input as (
             way_id
         ,   geom
         from
-            osm.double_edged_graph_dev 
+            osm.highways_dev 
 --        order by
 --            random()
-        limit 1
+       --limit 1
         ) a
     --limit 1
     )
 select
     output.*
+--,   unnest(source_node_buffer_splits)
 --,   sum(cardinality(output.source_node_buffer_splits))
 from
     input input
