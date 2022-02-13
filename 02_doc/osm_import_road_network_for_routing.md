@@ -23,7 +23,7 @@
 ### Functions and order of execution
 
 1. create_edges_and_vertices     => 00_create_edges_table.sql
-2. chop_lines_and_extract_nodes  => 
+2. chop_lines_and_extract_nodes  => chop_lines_and_extract_source_nodes_function_test.sql
 
 ## II. Creating the "Access Graph"
 
