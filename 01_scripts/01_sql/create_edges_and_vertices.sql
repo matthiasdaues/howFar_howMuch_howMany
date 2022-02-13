@@ -43,10 +43,7 @@ AS $BODY$
 DECLARE
     
     way_geom                      geometry;
-    junction_points               geometry;
-	way_geom_enhanced             geometry;
-	way_geom_enhanced_dump        geometry_dump;
-    way_geom_enhanced_dump_points geometry_dump;
+    way_geom_dump                 geometry_dump;
 	
 	edges                         jsonb;
 	
@@ -63,6 +60,7 @@ DECLARE
 
 BEGIN
     
+    /* create a json-document from the input geometry's attributes and call it "properties" */ 
 	select into properties 
 	    json_build_object(
 				  'osm_highway'
@@ -81,31 +79,25 @@ BEGIN
         where way.way_id = this_way_id
 	    ;
 		
+	/* select the road geometry that is actually segmentized */
     select into way_geom
         way.geom::geometry
         from osm.highways_dev way                             /* todo: adapt source to prod */
         where way.way_id = this_way_id
         ;
-		
-    select into junction_points
-        st_union(
-            junction_node::geometry
-        )
-		from osm.junctions_dev junctions
-        where junctions.way_id = this_way_id
-        ;
-		
---    way_geom_enhanced := st_snap(way_geom, junction_points, 0.00001)::geometry;
-	way_geom_enhanced_dump := st_dump(st_snap(way_geom, junction_points, 0.00001)::geometry);
+    
+    /* dump the constituent points of the road geometry */
+	way_geom_dump := st_dump(way_geom::geometry);
 
-    return query
+    /* output the road segments with preserved attributes */
+	return query
 
     WITH segments AS (
  		SELECT 
  			ST_AsText(st_setsrid(ST_MakeLine(lag((pt).geom, 1, NULL) OVER (PARTITION BY way_id ORDER BY way_id, (pt).path), (pt).geom),4326))::geometry AS edge
  		,   round(st_length(st_setsrid(ST_MakeLine(lag((pt).geom, 1, NULL) OVER (PARTITION BY way_id ORDER BY way_id, (pt).path), (pt).geom),4326)::geography)::numeric(10,2),2)::text as length
 		FROM 
-            ST_DumpPoints((way_geom_enhanced_dump).geom) AS pt 
+            ST_DumpPoints((way_geom_dump).geom) AS pt 
 		)
  	SELECT
 		        this_way_id::bigint as way_id
