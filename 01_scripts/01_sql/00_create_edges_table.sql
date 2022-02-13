@@ -46,23 +46,23 @@ from
     input input
 ,   osm.create_edges_and_vertices(input.way) test
 
-union all 
-
-select
-    geohash_decode(
-        st_geohash(
-            st_lineinterpolatepoint(
-                junction_edge::geometry,0.5
-            ),10
-        )
-    ) as edge_id                                   
-,   addr_location_id as from_node
-,   junction_location_id as to_node
-,   junction_edge as geom
-,   null as properties
--- ,   0 as valid_from
--- ,   0 as valid_to
-from
-   osm.junctions_dev 
--- where
---    way_id = 22907279
+--union all 
+--
+--select
+--    geohash_decode(
+--        st_geohash(
+--            st_lineinterpolatepoint(
+--                junction_edge::geometry,0.5
+--            ),10
+--        )
+--    ) as edge_id                                   
+--,   addr_location_id as from_node
+--,   junction_location_id as to_node
+--,   junction_edge as geom
+--,   null as properties
+---- ,   0 as valid_from
+---- ,   0 as valid_to
+--from
+--   osm.junctions_dev 
+---- where
+----    way_id = 22907279

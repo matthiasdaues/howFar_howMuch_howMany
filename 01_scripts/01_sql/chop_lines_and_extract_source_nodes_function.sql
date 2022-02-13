@@ -79,7 +79,7 @@ begin
     /* select the road segments that connect to the processed vertex */
     select into source_node_ways 
         st_collect(way.geom)
-        from osm.highways way
+        from osm.edges_dev way
         where st_intersects(st_buffer(this_node_geom::geography,0.05)::geometry,way.geom)
         /* Alternativer Ansatz oder Ergänzung: where st_touches(way.geom, source_node_geom) */
         --and   st_touches()
