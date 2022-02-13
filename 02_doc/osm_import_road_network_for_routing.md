@@ -22,8 +22,8 @@
 
 ### Functions and order of execution
 
-1. 
-2. chop_lines_and_extract_nodes
+1. create_edges_and_vertices     => 00_create_edges_table.sql
+2. chop_lines_and_extract_nodes  => 
 
 ## II. Creating the "Access Graph"
 
