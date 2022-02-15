@@ -7,7 +7,7 @@
    1. find the st_intersects spatial relation to enclosing features and
       1. add the "landuse" tag
       2. add the "leisure" tag
-      3. add the tags as arrays to compensate for paths crossing several type areas
+      3. add the tags as arrays to compnensate for paths crossing several type areas
 3. Prune the road network based on 
    1. road type
    2. area type

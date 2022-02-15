@@ -1,3 +1,4 @@
+---------------------------------------------------------------------------
 /* this expression chops up a road linestring into the constituent nodes */
 with input as (
     select
@@ -17,43 +18,45 @@ with input as (
     --limit 1
     )
     
-/* this expression creates edge segments from the chopped nodes, extending it by 100 meters in both directions */
+-----------------------------------------------------------------------------------------------------------------    
+/* this expression creates edge segments from the chopped nodes, extending it by ~10 meters in both directions */
 ,   way_segment_array as (
     select
         array[ 
             geohash_decode(st_geohash(from_node,10))
         ,   geohash_decode(st_geohash(to_node,10))
         ] as nodes
-    ,   geom
+    ,   edge_geom
     from
+----------------------------------------------
+/* this subselect creates the extended edge */ 
         (select
-            ST_MakeLine(lag(this_node_geom, 1, NULL) OVER (PARTITION BY this_way_id ORDER BY this_way_id, this_node_index), this_node_geom) as geom
-        ,   lag(this_node_geom, 1, NULL) OVER (PARTITION BY this_way_id ORDER BY this_way_id, this_node_index) as from_node
-        ,   this_node_geom as to_node
+            ST_MakeLine(
+                st_translate(from_node, sin(az1) * len, cos(az1) * len)
+            ,   st_translate(to_node, sin(az2) * len, cos(az2) * len)
+            ) as edge_geom
+        ,   from_node
+        ,   to_node
         from 
-            input
-        ) way_segment
-----------------------------
-
---SELECT ST_MakeLine(ST_TRANSLATE(a, sin(az1) * len, cos(az1) * 
---len),ST_TRANSLATE(b,sin(az2) * len, cos(az2) * len))
---
---  FROM (
---    SELECT a, b, ST_Azimuth(a,b) AS az1, ST_Azimuth(b, a) AS az2, ST_Distance(a,b) + 1000 AS len
---      FROM (
---        SELECT ST_StartPoint(the_geom) AS a, ST_EndPoint(the_geom) AS b
---          FROM ST_MakeLine(ST_MakePoint(1,2), ST_MakePoint(3,4)) AS the_geom
---    ) AS sub
---) AS sub2
-        
-        
-----------------------------
-        
-        
+------------------------------------------------------------------------------------------------------------
+/* this subselect creates the from_node and the to_node and calculates the azimuth angles between these two.
+ * Distance, extension factor and azimuth yield the input for the st_translate in the superset query.
+ */
+            (select
+                 lag(this_node_geom, 1, NULL) OVER (PARTITION BY this_way_id ORDER BY this_way_id, this_node_index) as from_node
+             ,   this_node_geom as to_node
+             ,   st_azimuth(lag(this_node_geom, 1, NULL) OVER (PARTITION BY this_way_id ORDER BY this_way_id, this_node_index),this_node_geom) as az1
+             ,   st_azimuth(this_node_geom,lag(this_node_geom, 1, NULL) OVER (PARTITION BY this_way_id ORDER BY this_way_id, this_node_index)) as az2
+             ,   ST_Distance(lag(this_node_geom, 1, NULL) OVER (PARTITION BY this_way_id ORDER BY this_way_id, this_node_index),this_node_geom) + 0.0001 as len
+             from
+                input
+            ) input 
+        ) way_segment        
     where
         way_segment.from_node is not null
     )
 
+----------------------------------------------------
 /* this expression generates the streetside nodes */    
 ,   sides as (
     select
@@ -67,10 +70,25 @@ with input as (
         ) output
     )
     
+----------------------------------------------------------------------------------------------------------------------
 /* this expression calculates the azimuth between the streetside nodes and the edge its source source edge segments */
---,   azimuth as (
---    )
+,   azimuth as (
+    select
+       st_azimuth(sides.child_node,st_closestpoint(sides.child_node,way_segment_array.edge_geom)) as azimuth
+    from
+        (select
+            source_node_id
+        ,   (st_dump(sides.source_node_buffer_splits)).geom as child_node
+        from
+            sides
+        ) sides
+    left join
+        way_segment_array way_segment_array
+    on 
+        sides.source_node_id = any (way_segment_array.nodes)
+    )
     
+-------------------------------------------------------------------------------------------------------------------------------
 /* this expression creates the street sides from grouping by azimuth and limiting pairing to closest distance between points */
 
 
@@ -79,16 +97,18 @@ with input as (
     
 /* the select inserts the edges into the edges table */
 select
-    sides.*
---,   way_segment_array.*
+--    azimuth.*
+--    sides.*
+    way_segment_array.*
 --,   source_node_id
 --,   source_node_index
 --,   (st_dump(source_node_buffer_splits)).geom
 --,   unnest(source_node_buffer_splits)
 --,   sum(cardinality(output.source_node_buffer_splits))
 from
-    sides sides
---    way_segment_array way_segment_array
+--    azimuth azimuth
+--    sides sides
+    way_segment_array way_segment_array
     
 
 -- order by
