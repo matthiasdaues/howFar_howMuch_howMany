@@ -49,3 +49,36 @@ order by
 ,   index[1] 
 ,   node_id
 ;
+
+
+
+with input as (
+    select
+        ((st_dumppoints(a.geom)).geom) as this_node_geom
+    ,   way_id as this_way_id
+    ,   unnest((st_dumppoints(a.geom)).path) as this_node_index
+    from 
+        (select
+            way_id
+        ,   geom
+        from
+            osm.highways_dev 
+--        order by
+--            random()
+       --limit 1
+        ) a
+    --limit 1
+    )
+select
+    *
+,   (st_dump(st_intersection(st_exteriorring(st_buffer(this_node_geom::geography,1)::geometry),way.geom))).geom
+,   degrees(st_azimuth(this_node_geom,(st_dump(st_intersection(st_exteriorring(st_buffer(this_node_geom::geography,1)::geometry),way.geom))).geom))
+,   st_collect(
+        st_project(this_node_geom::geography , 1 , radians(degrees(st_azimuth(this_node_geom,(st_dump(st_intersection(st_exteriorring(st_buffer(this_node_geom::geography,1)::geometry),way.geom))).geom))+90))::geometry,
+    ,   st_project(this_node_geom::geography , 1 , radians(degrees(st_azimuth(this_node_geom,(st_dump(st_intersection(st_exteriorring(st_buffer(this_node_geom::geography,1)::geometry),way.geom))).geom))-90))::geometry           
+    )
+from 
+    input i
+,   osm.highways_dev way
+where 
+    i.this_way_id = way.way_id

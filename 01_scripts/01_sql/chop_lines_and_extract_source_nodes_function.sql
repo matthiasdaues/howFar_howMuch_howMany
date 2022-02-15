@@ -27,10 +27,10 @@ RETURNS TABLE(
 ,   source_node_geom               geometry
 ,   source_node_index              integer
 ,   source_node_degree             integer
---,   source_node_buffer             geometry
---,   source_node_buffer_ring_joint  geometry
---,   source_node_ways               geometry
---,   source_node_intersections      geometry
+,   source_node_ways               geometry
+,   source_node_buffer             geometry
+,   source_node_buffer_ring_joint  geometry
+,   source_node_intersections      geometry
 --,   source_node_intersections_hash text[]
 --,   source_node_degree             integer
 ,   source_node_buffer_splits      geometry
@@ -72,14 +72,15 @@ begin
     ways_source                          := 'osm.highways';
     
     source_node_id                       := geohash_decode(st_geohash(this_node_geom,10)); 
-    source_node_geom                     := st_setsrid(st_centroid(st_geomfromgeohash(st_geohash(this_node_geom,10))),4326)::geometry;
-    source_node_buffer                   := st_buffer(this_node_geom::geography,1)::geometry;
+--    source_node_geom                     := st_setsrid(st_centroid(st_geomfromgeohash(st_geohash(this_node_geom,10))),4326)::geometry;
+    source_node_geom                     := this_node_geom;
+    source_node_buffer                   := st_buffer(source_node_geom::geography,1)::geometry;
     source_node_buffer_ring_joint        := st_pointn(st_exteriorring(source_node_buffer),1); 
     
     /* select the road segments that connect to the processed vertex */
     select into source_node_ways 
         st_collect(way.geom)
-        from osm.edges_dev way
+        from osm.highways_dev way
         where st_intersects(st_buffer(this_node_geom::geography,0.05)::geometry,way.geom)
         /* Alternativer Ansatz oder Ergänzung: where st_touches(way.geom, source_node_geom) */
         --and   st_touches()
@@ -102,31 +103,52 @@ begin
     /* calculate the vertex' degree by counting the intersections of the buffer with connecting road segments */
     source_node_degree                   := st_numgeometries(source_node_intersections);
 
-    /* construct the buffer segments between the intersection points. Note the st_union needed to dissolve the remaining ring-line segments */
+    /* construct the buffer segments between the intersection points. Note the st_union needed to dissolve the remaining ring-line segments. */
+    /* there's several case differentiations necessary which result from node degree and from treating the polygon hull as an exterior ring (linestring) */
     with split as (
         select
             (st_dump((st_split(st_snap(st_exteriorring(source_node_buffer),source_node_intersections,0.0001),source_node_intersections)))).geom as split
+        where
+            source_node_degree != 1
+        )
+    ,    split_1 as (
+        select 
+            (st_dump((st_split(st_snap(st_exteriorring(source_node_buffer),source_node_intersections,0.0001),source_node_intersections)))).geom as split
+        where
+            source_node_degree = 1
         )
     select into source_node_buffer_splits
-        case 
-         when source_node_degree = 1 
-          then st_collect(st_lineinterpolatepoints(split.split,0.5))
-         else st_collect(st_lineinterpolatepoint(split.split,0.5))
-        end
+        st_collect(split.split)
+    from 
+    /* splits of nodes with degree 2 or greater */
+    /* splitting buffer segments merged from two exterior ring fragments */
+        (select
+            st_lineinterpolatepoint(st_linemerge(st_union(split.split)),0.5) as split
         from 
-            (select
-                st_linemerge(st_union(split.split)) as split
-             from 
-                split
-             where
-                st_touches(split.split,source_node_buffer_ring_joint) is true
-             union all select
-                split.split as split
-             from
-                split
-             where
-                st_touches(split.split,source_node_buffer_ring_joint) is false 
-             ) split       
+            split
+        where
+            st_touches(split.split,source_node_buffer_ring_joint) is true
+    /* splitting unmerged buffer segments */
+        union all select
+            st_lineinterpolatepoint(split.split,0.5) as split
+        from
+            split
+        where
+            st_touches(split.split,source_node_buffer_ring_joint) is false
+    /* splits of nodes with degree 1  */
+        union all select
+            st_project(source_node_geom::geography , 1 , radians(degrees(st_azimuth(source_node_geom,(st_dump(st_intersection(st_exteriorring(st_buffer(source_node_geom::geography,1)::geometry),source_node_ways))).geom))+90))::geometry as split
+        where
+            source_node_degree = 1
+            
+        union all select
+            st_project(source_node_geom::geography , 1 , radians(degrees(st_azimuth(source_node_geom,(st_dump(st_intersection(st_exteriorring(st_buffer(source_node_geom::geography,1)::geometry),source_node_ways))).geom))-90))::geometry as split
+        where
+            source_node_degree = 1
+        ) split
+            
+
+
     ;
 
     child_node_hull                      := case 
@@ -156,10 +178,10 @@ begin
     ,   source_node_geom                     
     ,   this_node_index as source_node_index
     ,   source_node_degree
---    ,   source_node_buffer
---    ,   source_node_buffer_ring_joint
---    ,   source_node_ways
---    ,   source_node_intersections
+    ,   source_node_ways
+    ,   source_node_buffer
+    ,   source_node_buffer_ring_joint
+    ,   source_node_intersections
 --    ,   source_node_intersections_hash
 --    ,   source_node_degree
     ,   source_node_buffer_splits
