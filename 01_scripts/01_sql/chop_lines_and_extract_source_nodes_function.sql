@@ -24,17 +24,17 @@ CREATE OR REPLACE FUNCTION osm.chop_lines_and_extract_nodes(
 
 RETURNS TABLE(
     source_node_id                 bigint
-,   source_node_geom               geometry
+--,   source_node_geom               geometry
 ,   source_node_index              integer
-,   source_node_degree             integer
-,   source_node_ways               geometry
-,   source_node_buffer             geometry
-,   source_node_buffer_ring_joint  geometry
-,   source_node_intersections      geometry
---,   source_node_intersections_hash text[]
 --,   source_node_degree             integer
+--,   source_node_ways               geometry
+--,   source_node_buffer             geometry
+--,   source_node_buffer_ring_joint  geometry
+--,   source_node_intersections      geometry
+--,   source_node_intersections_hash text[]
 ,   source_node_buffer_splits      geometry
 ,   child_node_hull                geometry
+,   source_way_id                  bigint
 ) 
 
 
@@ -49,18 +49,19 @@ declare
     
     source_node_id                       bigint;
     source_node_geom                     geometry;
-    source_node_geom_from_hash           geometry;
+--    source_node_geom_from_hash           geometry;
     source_node_buffer                   geometry;
     source_node_buffer_ring_joint        geometry;
     source_node_index                    integer;
     source_node_ways                     geometry;
     source_node_intersections            geometry;
-    source_node_intersections_hash       text[];
+--    source_node_intersections_hash       text[];
     source_node_degree                   integer;
     source_node_buffer_splits            geometry;
     source_node_buffer_splits_union      geometry;
     source_node_children                 geometry;
     child_node_hull                      geometry;
+    source_way_id                        bigint;
     
     
 
@@ -80,7 +81,7 @@ begin
     /* select the road segments that connect to the processed vertex */
     select into source_node_ways 
         st_collect(way.geom)
-        from osm.highways_dev way
+        from osm.highways way
         where st_intersects(st_buffer(this_node_geom::geography,0.05)::geometry,way.geom)
         /* Alternativer Ansatz oder Ergänzung: where st_touches(way.geom, source_node_geom) */
         --and   st_touches()
@@ -94,11 +95,11 @@ begin
     ;
     
     /* calculate the geohash of the intersection point */
-    select into source_node_intersections_hash
-        array_agg(sec.sec)
-        from lateral
-        (select st_geohash((st_dump(source_node_intersections)).geom,10) as sec) sec
-    ;
+--    select into source_node_intersections_hash
+--        array_agg(sec.sec)
+--        from lateral
+--        (select st_geohash((st_dump(source_node_intersections)).geom,10) as sec) sec
+--    ;
     
     /* calculate the vertex' degree by counting the intersections of the buffer with connecting road segments */
     source_node_degree                   := st_numgeometries(source_node_intersections);
@@ -175,18 +176,17 @@ begin
     
     select  
         source_node_id          
-    ,   source_node_geom                     
+--    ,   source_node_geom                     
     ,   this_node_index as source_node_index
-    ,   source_node_degree
-    ,   source_node_ways
-    ,   source_node_buffer
-    ,   source_node_buffer_ring_joint
-    ,   source_node_intersections
---    ,   source_node_intersections_hash
 --    ,   source_node_degree
+--    ,   source_node_ways
+--    ,   source_node_buffer
+--    ,   source_node_buffer_ring_joint
+--    ,   source_node_intersections
+--    ,   source_node_intersections_hash
     ,   source_node_buffer_splits
     ,   child_node_hull
---    ,   this_way_id        
+    ,   this_way_id as source_way_id    
 --    ,   source_node_geom_from_hash 
 --    ,   source_node_buffer     
     

@@ -8,8 +8,8 @@ with grafts as (
 	    osm.junctions
 	group by
 	    way_id
-	limit
-	    1
+	--limit
+	--    1
     )
 select
     st_snap(
