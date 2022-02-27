@@ -15,5 +15,5 @@ osm2pgsql -H localhost -P 25432 -U gis -W -d gis -O flex -S addr.lua germany.osm
 osmium getid germany-latest.osm.pbf w43636167 -o test.osm.pbf
 
 # Import "generic"
-osm2pgsql -H localhost -P 25432 -U gis -W -d gis -O flex -S generic.lua hamburg-latest.osm.pbf
+osm2pgsql -H localhost -P 25432 -U gis -W -d gis -O flex -S generic.lua germany-latest.osm.pbf
 
