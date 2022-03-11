@@ -43,3 +43,34 @@
 The result of this sketched out process will be a detailed road network graph. In residential areas it will be a fine grained street side differentiating routing network. Those fine grained near-terminus parts will be connected with far ranging logical edges in non-residential areas. 
 
 The routing will be calculated on the logical edges only. The dataset will preserve the prior geometry as a geometry array or multigeometry, thus combining a logical network with its physical representation within one data structure.
+
+---
+
+Steps towards the universal graph:
+
+1. graft point junctions into road edges
+   1. Input: 
+      - points of interest 
+      - road network
+   2. Functions: 
+      - asd
+      - asd 
+   4. Result
+      - asd
+      - asd 
+
+
+2. create all new nodes
+   1. Input: 
+      - points of interest 
+      - road network
+   2. Functions: 
+   3. Result
+
+
+3. create all new edges
+   1. Input: 
+      - points of interest 
+      - road network
+   2. Functions: 
+   3. Result
