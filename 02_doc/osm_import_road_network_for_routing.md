@@ -46,21 +46,42 @@ The routing will be calculated on the logical edges only. The dataset will prese
 
 ---
 
-Steps towards the universal graph:
+Steps towards the universal graph
 
-1. graft point junctions into road edges
+What kind of edges do we create in the process?
+
+| source                             | target                                          |
+| :--------------------------------- | :---------------------------------------------- |
+| road segment                       | duplicate edges left and right                  |
+| vertex with degree 1               | a simple bridge                                 |
+| vertex with degree 2               | a simple bridge                                 |
+| vertex with degree 3 or more       | a number of bridges equal to the vertex' degree |
+| vertex from "closest point to PoI" | a simple edge                                   |
+|                                    |                                                 |
+
+---
+
+
+1. create point junctions
    1. Input: 
-      - points of interest 
+      - points of interest
       - road network
    2. Functions: 
       - asd
       - asd 
-   4. Result
-      - asd
-      - asd 
+   3. Result
+      - nodes in provisory node table with type "junction"
+        - node_id
+        - geom
+        - type = junction
+        - properties
+          - way_id
+          - poi_type
 
+2. graft nodes into road segments
+ 
 
-2. create all new nodes
+3. create all new nodes
    1. Input: 
       - points of interest 
       - road network
@@ -68,9 +89,45 @@ Steps towards the universal graph:
    3. Result
 
 
-3. create all new edges
+4. create all new edges
    1. Input: 
       - points of interest 
       - road network
    2. Functions: 
    3. Result
+
+
+````mermaid
+
+graph TD;
+
+A(addresses)
+B(Access Points)
+C(other PoI)
+
+D{create<br>junctions}
+
+E(road_network)
+
+F(enhanced road<br>linestring)
+
+G(Segments)
+
+H(nodes)
+
+A-->D
+B-->D
+C-->D
+
+D--graft junction into road segment-->F
+
+E-->F
+
+F--Split linestring<br>into segments-->G
+
+G--create child nodes<br>from each edge-->H
+
+
+
+
+````
