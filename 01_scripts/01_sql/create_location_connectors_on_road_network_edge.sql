@@ -1,6 +1,6 @@
 /*
 
-This script creates a function to ge all junction points connecting 
+This script creates a function to get all junction points connecting 
 all adjacent addresses to their nearest neighbour edge.
 
 The function returns a linestring with the interpolated and snapped

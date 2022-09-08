@@ -97,8 +97,7 @@ What kind of edges do we create in the process?
    3. Result
 
 
-````mermaid
-
+```mermaid
 graph TD;
 
 A(addresses)
@@ -126,8 +125,5 @@ E-->F
 F--Split linestring<br>into segments-->G
 
 G--create child nodes<br>from each edge-->H
-
-
-
 
 ````
