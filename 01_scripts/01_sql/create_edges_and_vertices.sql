@@ -75,7 +75,7 @@ BEGIN
 					  ,   way.name                 
 					  )
 				  ) 
-        from osm.highways_dev way
+        from osm.highways way
         where way.way_id = this_way_id
 	    ;
 		

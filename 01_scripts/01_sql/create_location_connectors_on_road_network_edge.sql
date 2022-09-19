@@ -4,7 +4,7 @@ This script creates a function to get all junction points connecting
 all adjacent addresses to their nearest neighbour edge.
 
 The function returns a linestring with the interpolated and snapped
-junction points grafted into the oringinal linestring geometry.
+junction points grafted into the original linestring geometry.
 
 */
 

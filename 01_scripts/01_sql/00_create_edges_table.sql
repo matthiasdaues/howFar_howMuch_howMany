@@ -18,7 +18,7 @@ create index edge_dev_to_node_id_idx on osm.edges_dev using btree (to_node);
 create index edge_dev_type_idx on osm.edges_dev using btree (type);
 create index edge_dev_geom_idx on osm.edges_dev using gist (geom);
 
---truncate table osm.edges;
+truncate table osm.edges;
 
 with input as (
     select
@@ -31,7 +31,7 @@ with input as (
         way_id
     -- order by
     --    random()
-    -- limit
+    limit 10
     --     random()*10000
     )
 insert into osm.edges_dev
