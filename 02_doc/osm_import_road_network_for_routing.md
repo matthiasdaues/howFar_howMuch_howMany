@@ -35,7 +35,7 @@
 ## III. Create a simplified logical graph
 
 1. identify nodes having degree = 2
-2. collaps contiguous edges consisting of such nodes into one logical edge
+2. collapse contiguous edges consisting of such nodes into one logical edge
       1. add the length of the constituent edges
       2. collect the node_ids with degree 2 into an array ordered by path index
 3. collect the edge geometries into a geometry collection of linestring primitives
