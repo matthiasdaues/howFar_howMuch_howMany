@@ -1,8 +1,9 @@
 drop table if exists osm.edges_dev cascade;
 create table osm.edges_dev (
-    edge_id    bigint
- ,   from_node    bigint
- ,   to_node  bigint
+    edge_id     bigint
+ ,   from_node  bigint
+ ,   to_node    bigint
+ ,   type       text
  ,   geom       geometry(LineString,4326)
  ,   properties jsonb
  ,   valid_from date
@@ -11,10 +12,11 @@ create table osm.edges_dev (
  ;
 
 
- create index edge_dev_id_idx on osm.edges_dev using btree (edge_id);
- create index edge_dev_from_node_id_idx on osm.edges_dev using btree (from_node);
- create index edge_dev_to_node_id_idx on osm.edges_dev using btree (to_node);
- create index edge_dev_geom_idx on osm.edges_dev using gist (geom);
+create index edge_dev_id_idx on osm.edges_dev using btree (edge_id);
+create index edge_dev_from_node_id_idx on osm.edges_dev using btree (from_node);
+create index edge_dev_to_node_id_idx on osm.edges_dev using btree (to_node);
+create index edge_dev_type_idx on osm.edges_dev using btree (type);
+create index edge_dev_geom_idx on osm.edges_dev using gist (geom);
 
 --truncate table osm.edges;
 
@@ -22,7 +24,7 @@ with input as (
     select
         way_id as way
     from
-        osm.highways_dev
+        osm.highways
 --  where
 --      way_id = 22907279
     group by
@@ -37,6 +39,7 @@ select
     test.edge_id
 ,   test.from_node_id as from_node
 ,   test.to_node_id as to_node
+,   'street_network' as type
 ,   test.edge_geom as geom
 ,   test.edge_properties as properties
 -- ,   0 as valid_from
