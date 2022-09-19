@@ -4,6 +4,7 @@ tables.highways = osm2pgsql.define_way_table('highways', {
     { column = 'type', type = 'text' },
     { column = 'name', type = 'text' },
     { column = 'surface', type = 'text'},
+    { column = 'tags', type = 'jsonb'},
     { column = 'geom', type = 'linestring', projection = 4326 },
     },{ schema = 'osm' }
 )
