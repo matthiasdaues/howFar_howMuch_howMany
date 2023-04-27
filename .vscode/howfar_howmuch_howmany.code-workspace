@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../notes"
+		},
+		{
+			"path": "../../../repos/dt_vf/kubus/kubus_database"
 		}
 	],
 	"settings": {}
