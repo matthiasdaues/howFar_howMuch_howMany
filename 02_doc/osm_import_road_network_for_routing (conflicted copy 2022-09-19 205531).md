@@ -97,24 +97,33 @@ What kind of edges do we create in the process?
    3. Result
 
 
-```kroki-mermaid
-graph TD
+```mermaid
+graph TD;
 
 A(addresses)
 B(Access Points)
 C(other PoI)
-D{create junctions}
+
+D{create<br>junctions}
+
 E(road_network)
-F(enhanced road linestring)
+
+F(enhanced road<br>linestring)
+
 G(Segments)
+
 H(nodes)
 
-A --> D
-B --> D
-C --> D
-D --graft junction into road segment--> F
-E --> F
-F --Split linestring into segments--> G
-G --create child nodes from each edge--> H
+A-->D
+B-->D
+C-->D
+
+D--graft junction into road segment-->F
+
+E-->F
+
+F--Split linestring<br>into segments-->G
+
+G--create child nodes<br>from each edge-->H
 
 ```
